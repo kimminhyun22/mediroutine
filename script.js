@@ -31,6 +31,9 @@ const routineForm = document.querySelector("#routineForm");
 const toast = document.querySelector("#toast");
 const shareToggle = document.querySelector("#shareToggle");
 const shareText = document.querySelector("#shareText");
+const openCameraHero = document.querySelector("#openCameraHero");
+const openCamera = document.querySelector("#openCamera");
+const openAlbum = document.querySelector("#openAlbum");
 const cameraImage = document.querySelector("#cameraImage");
 const prescriptionImage = document.querySelector("#prescriptionImage");
 const ocrPreview = document.querySelector("#ocrPreview");
@@ -214,6 +217,24 @@ function handleOcrImageChange(input) {
 
 cameraImage.addEventListener("change", () => handleOcrImageChange(cameraImage));
 prescriptionImage.addEventListener("change", () => handleOcrImageChange(prescriptionImage));
+
+function openFilePicker(input, message) {
+  showToast(message);
+  input.value = "";
+  input.click();
+}
+
+openCameraHero.addEventListener("click", () => {
+  openFilePicker(cameraImage, "카메라를 여는 중이에요.");
+});
+
+openCamera.addEventListener("click", () => {
+  openFilePicker(cameraImage, "카메라를 여는 중이에요.");
+});
+
+openAlbum.addEventListener("click", () => {
+  openFilePicker(prescriptionImage, "앨범을 여는 중이에요.");
+});
 
 document.querySelector("#runOcr").addEventListener("click", async () => {
   const file = selectedOcrFile;

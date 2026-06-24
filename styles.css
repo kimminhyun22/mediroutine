@@ -391,11 +391,17 @@ button {
 }
 
 .upload-zone {
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
   display: grid;
   grid-template-columns: 38px minmax(0, 1fr);
   gap: 3px 12px;
   align-items: center;
   cursor: pointer;
+  text-align: left;
 }
 
 .upload-zone strong {
@@ -442,13 +448,6 @@ button {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-}
-
-.file-button {
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  text-align: center;
 }
 
 .ocr-result {
