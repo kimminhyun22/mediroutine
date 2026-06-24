@@ -138,7 +138,19 @@ function applyOcrText(text) {
   document.querySelector("#medicineName").value = name;
   document.querySelector("#medicineTime").value = `${hour}:${minute}`;
   document.querySelector("#medicineRule").value = rule;
-  ocrResult.textContent = `읽은 내용\n${text.trim()}\n\n자동 입력: ${name}, ${hour}:${minute}, ${rule}`;
+  ocrResult.innerHTML = `
+    <div class="ocr-summary">
+      <strong>자동 입력 완료</strong>
+      <span>약 이름: ${escapeHtml(name)}</span>
+      <span>복용 시간: ${hour}:${minute}</span>
+      <span>복용 기준: ${escapeHtml(rule)}</span>
+    </div>
+    <p class="ocr-help">아래 입력칸을 확인하고 틀린 부분만 직접 고치면 돼요.</p>
+    <details class="ocr-raw">
+      <summary>읽은 원문 보기</summary>
+      <pre>${escapeHtml(text.trim()).slice(0, 1500)}</pre>
+    </details>
+  `;
 }
 
 function setOcrStatus(message) {

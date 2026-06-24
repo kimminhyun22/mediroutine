@@ -484,7 +484,44 @@ button {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.5;
+}
+
+.ocr-summary {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #e7f6ee;
+  color: var(--green-dark);
+}
+
+.ocr-summary strong {
+  color: var(--green-dark);
+  font-size: 15px;
+}
+
+.ocr-help {
+  margin: 10px 2px;
+}
+
+.ocr-raw {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+
+.ocr-raw summary {
+  cursor: pointer;
+  color: var(--green-dark);
+  font-weight: 800;
+}
+
+.ocr-raw pre {
+  max-height: 180px;
+  overflow: auto;
   white-space: pre-wrap;
+  word-break: break-word;
+  margin: 8px 0 0;
+  color: var(--muted);
 }
 
 .routine-form label {
