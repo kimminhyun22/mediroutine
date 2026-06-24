@@ -215,6 +215,32 @@ button {
   box-shadow: var(--shadow);
 }
 
+.quick-capture {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border: 1px solid #b8cac1;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 8px 28px rgba(36, 53, 45, 0.07);
+}
+
+.quick-capture div {
+  display: grid;
+  gap: 4px;
+}
+
+.quick-capture strong {
+  font-size: 17px;
+}
+
+.quick-capture span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .hero-copy {
   padding: 36px;
   position: relative;
@@ -668,10 +694,25 @@ button {
 
   .top-actions {
     width: 100%;
+    display: grid;
+    grid-template-columns: 42px 1fr 1fr;
   }
 
   .top-actions .primary-button {
-    flex: 1;
+    width: 100%;
+  }
+
+  .top-actions #openAdd {
+    grid-column: 1 / -1;
+  }
+
+  .quick-capture {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .quick-capture .primary-button {
+    width: 100%;
   }
 
   .hero-copy {

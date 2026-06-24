@@ -31,6 +31,8 @@ const routineForm = document.querySelector("#routineForm");
 const toast = document.querySelector("#toast");
 const shareToggle = document.querySelector("#shareToggle");
 const shareText = document.querySelector("#shareText");
+const quickCamera = document.querySelector("#quickCamera");
+const quickCameraBand = document.querySelector("#quickCameraBand");
 const openCameraHero = document.querySelector("#openCameraHero");
 const openCamera = document.querySelector("#openCamera");
 const openAlbum = document.querySelector("#openAlbum");
@@ -213,6 +215,7 @@ function handleOcrImageChange(input) {
   ocrPreview.src = URL.createObjectURL(file);
   ocrPreview.hidden = false;
   ocrResult.textContent = "사진을 불러왔어요. 이제 글자 읽기를 눌러주세요.";
+  document.querySelector("#addPanel").scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 cameraImage.addEventListener("change", () => handleOcrImageChange(cameraImage));
@@ -225,6 +228,14 @@ function openFilePicker(input, message) {
 }
 
 openCameraHero.addEventListener("click", () => {
+  openFilePicker(cameraImage, "카메라를 여는 중이에요.");
+});
+
+quickCamera.addEventListener("click", () => {
+  openFilePicker(cameraImage, "카메라를 여는 중이에요.");
+});
+
+quickCameraBand.addEventListener("click", () => {
   openFilePicker(cameraImage, "카메라를 여는 중이에요.");
 });
 
