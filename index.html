@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1f8f64" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="메디루틴" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>메디루틴 | 복약 루틴 관리</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./assets/icon-192.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="서비스 메뉴">
+        <a class="brand" href="#" aria-label="메디루틴 홈">
+          <span class="brand-mark">M</span>
+          <span>메디루틴</span>
+        </a>
+        <nav class="nav-list">
+          <button class="nav-item active" type="button" title="오늘"><span class="icon">●</span>오늘</button>
+          <button class="nav-item" type="button" title="기록"><span class="icon">▦</span>기록</button>
+          <button class="nav-item" type="button" title="가족"><span class="icon">◌</span>가족</button>
+          <button class="nav-item" type="button" title="설정"><span class="icon">⚙</span>설정</button>
+        </nav>
+        <div class="side-note">
+          <strong>오늘의 안심 상태</strong>
+          <span>아침 루틴 완료, 점심 루틴 대기 중</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="topbar" aria-label="오늘 요약">
+          <div>
+            <p class="eyebrow">2026년 6월 24일 수요일</p>
+            <h1>오늘 복약 루틴</h1>
+          </div>
+          <div class="top-actions">
+            <button class="icon-button" type="button" title="알림"><span>◔</span></button>
+            <button class="secondary-button" id="installApp" type="button">휴대폰 설치</button>
+            <button class="primary-button" id="openAdd" type="button">루틴 추가</button>
+          </div>
+        </section>
+
+        <section class="hero-band" aria-label="서비스 소개">
+          <div class="hero-copy">
+            <p class="eyebrow">복약을 잊지 않도록, 부담은 덜어내도록</p>
+            <h2>나와 가족의 약 먹는 시간을 조용히 챙겨요.</h2>
+            <p>
+              시간 알림, 복용 체크, 남은 약 관리, 보호자 공유까지 한 화면에서
+              자연스럽게 이어지는 복약 파트너입니다.
+            </p>
+          </div>
+          <img
+            src="./assets/mediroutine-visual.png"
+            alt="스마트폰 복약 관리 화면과 약 정리함이 놓인 제품 이미지"
+          />
+        </section>
+
+        <section class="dashboard-grid">
+          <div class="panel today-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">다음 복약</p>
+                <h2>점심 식후 30분</h2>
+              </div>
+              <span class="status-chip">12:40 예정</span>
+            </div>
+
+            <div class="progress-wrap">
+              <div class="progress-ring" aria-label="오늘 복약 진행률">
+                <span id="progressValue">50%</span>
+              </div>
+              <div>
+                <strong id="progressTitle">2개 중 1개 완료</strong>
+                <p>체크하면 보호자에게 안심 메시지가 공유됩니다.</p>
+              </div>
+            </div>
+
+            <div class="dose-list" id="doseList"></div>
+          </div>
+
+          <div class="panel add-panel" id="addPanel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">새 루틴</p>
+                <h2>약 등록</h2>
+              </div>
+              <button class="secondary-button" id="scanPreset" type="button">처방전 예시</button>
+            </div>
+
+            <div class="ocr-box">
+              <label class="upload-zone" for="prescriptionImage">
+                <span class="upload-icon">▣</span>
+                <strong>약봉투 사진으로 자동 입력</strong>
+                <span>이미지를 올리면 글자를 읽어 등록폼에 채워요.</span>
+              </label>
+              <input id="prescriptionImage" type="file" accept="image/*" />
+              <img id="ocrPreview" alt="업로드한 처방전 또는 약봉투 미리보기" hidden />
+              <div class="ocr-actions">
+                <button class="secondary-button" id="runOcr" type="button">글자 읽기</button>
+                <button class="secondary-button" id="demoOcr" type="button">샘플 읽기</button>
+              </div>
+              <div class="ocr-result" id="ocrResult" aria-live="polite">아직 읽은 내용이 없어요.</div>
+            </div>
+
+            <form class="routine-form" id="routineForm">
+              <label>
+                약 이름
+                <input id="medicineName" type="text" placeholder="예: 혈압약" required />
+              </label>
+              <label>
+                복용 시간
+                <input id="medicineTime" type="time" required />
+              </label>
+              <label>
+                복용 기준
+                <select id="medicineRule">
+                  <option>식후 30분</option>
+                  <option>식전</option>
+                  <option>잠들기 전</option>
+                  <option>아침 기상 후</option>
+                </select>
+              </label>
+              <button class="primary-button full" type="submit">오늘 루틴에 추가</button>
+            </form>
+          </div>
+
+          <div class="panel insight-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">이번 주 기록</p>
+                <h2>복약 흐름</h2>
+              </div>
+              <span class="status-chip good">86%</span>
+            </div>
+            <div class="week-bars" aria-label="주간 복약 기록">
+              <span style="height: 58%"></span>
+              <span style="height: 82%"></span>
+              <span style="height: 72%"></span>
+              <span style="height: 94%"></span>
+              <span style="height: 66%"></span>
+              <span style="height: 88%"></span>
+              <span style="height: 50%"></span>
+            </div>
+            <p class="soft-copy">오전 루틴은 안정적이고, 저녁 루틴은 평균 18분 늦어지고 있어요.</p>
+          </div>
+
+          <div class="panel family-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">가족 안심 공유</p>
+                <h2>보호자 연결</h2>
+              </div>
+              <label class="toggle">
+                <input id="shareToggle" type="checkbox" checked />
+                <span></span>
+              </label>
+            </div>
+            <div class="family-row">
+              <div class="avatar">김</div>
+              <div>
+                <strong>김민서 보호자</strong>
+                <p id="shareText">복약 완료 시 안심 메시지 전송 중</p>
+              </div>
+            </div>
+            <button class="secondary-button full" id="copyShare" type="button">공유 링크 복사</button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="install-dialog" id="installDialog" aria-labelledby="installTitle">
+      <div class="install-head">
+        <div>
+          <p class="eyebrow">홈 화면 앱 설치</p>
+          <h2 id="installTitle">메디루틴을 휴대폰에 추가하기</h2>
+        </div>
+        <button class="icon-button" id="closeInstall" type="button" title="닫기">×</button>
+      </div>
+      <div class="install-steps">
+        <section>
+          <strong>아이폰 Safari</strong>
+          <p>공유 버튼을 누른 뒤 “홈 화면에 추가”를 선택하세요.</p>
+        </section>
+        <section>
+          <strong>안드로이드 Chrome</strong>
+          <p>오른쪽 위 메뉴에서 “앱 설치” 또는 “홈 화면에 추가”를 선택하세요.</p>
+        </section>
+      </div>
+      <p class="install-note">
+        휴대폰에서 설치하려면 이 페이지를 인터넷 주소로 열어야 해요. 컴퓨터 파일 주소로 열면
+        설치 버튼이 제한될 수 있습니다.
+      </p>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./script.js"></script>
+  </body>
+</html>
