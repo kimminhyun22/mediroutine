@@ -1,4 +1,4 @@
-const CACHE_NAME = "mediroutine-v8";
+const CACHE_NAME = "mediroutine-v9";
 const ASSETS = [
   "./",
   "./index.html",

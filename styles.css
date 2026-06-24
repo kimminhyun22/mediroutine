@@ -504,6 +504,47 @@ button {
   margin: 10px 2px;
 }
 
+.ocr-candidates {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ocr-candidates > strong {
+  color: var(--ink);
+}
+
+.ocr-candidate {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfc;
+}
+
+.ocr-candidate span {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.ocr-candidate div {
+  display: flex;
+  gap: 6px;
+}
+
+.ocr-candidate button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: #ffffff;
+  color: var(--green-dark);
+  font-weight: 800;
+}
+
 .ocr-raw {
   border-top: 1px solid var(--line);
   padding-top: 8px;

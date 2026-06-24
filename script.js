@@ -118,22 +118,93 @@ routineForm.addEventListener("submit", (event) => {
 });
 
 document.querySelector("#scanPreset").addEventListener("click", () => {
-  applyOcrText("약품명: 저녁 콜레스테롤약\n용법: 잠들기 전\n복용시간: 20:30");
+  applyOcrText(
+    "약품명: 저녁 콜레스테롤약\n벤프라정20밀리그램\n유파티렌정\n포리부틴정\n용법: 잠들기 전\n복용시간: 20:30",
+  );
   showToast("처방전 촬영 결과 예시를 채웠어요.");
 });
 
-function applyOcrText(text) {
+function getOcrSchedule(text) {
   const normalized = text.replace(/\s+/g, " ").trim();
   const timeMatch = normalized.match(/([01]?\d|2[0-3])[:시]\s?([0-5]\d)?/);
   const knownRules = ["식후 30분", "식전", "잠들기 전", "아침 기상 후"];
   const rule = knownRules.find((item) => normalized.includes(item)) || "식후 30분";
-  const nameMatch =
-    text.match(/(?:약품명|약명|약 이름|의약품)[:\s]+([^\n]+)/) ||
-    text.match(/([가-힣A-Za-z0-9]+(?:약|정|캡슐|시럽))/);
-
-  const name = nameMatch?.[1]?.replace(/[.,]/g, "").trim() || "처방 약";
   const hour = timeMatch ? timeMatch[1].padStart(2, "0") : "08";
   const minute = timeMatch?.[2] || "00";
+
+  return { hour, minute, rule };
+}
+
+function cleanMedicineCandidate(value) {
+  return value
+    .replace(/[^\uAC00-\uD7A3A-Za-z0-9.()/%\s-]/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\s+(?:용량|효능|복용|조제|처방).*$/g, "")
+    .trim();
+}
+
+function extractMedicineCandidates(text) {
+  const candidates = [];
+  const seen = new Set();
+  const badWords = ["처방전", "처방조제", "복용법", "조제일자", "성별", "환자", "병의원"];
+  const medicinePattern =
+    /[가-힣A-Za-z0-9][가-힣A-Za-z0-9.()/%\s-]{1,28}(?:정|캡슐|시럽|액|과립|산|겔|크림|연고)(?:\s*\d+(?:\.\d+)?\s*(?:밀리그램|mg|그램|g|ml|mL))?/g;
+
+  text.split(/\n+/).forEach((line) => {
+    const matches = line.match(medicinePattern) || [];
+    matches.forEach((match) => {
+      const cleaned = cleanMedicineCandidate(match);
+      const key = cleaned.replace(/\s/g, "").toLowerCase();
+      const looksBad =
+        cleaned.length < 3 ||
+        badWords.some((word) => cleaned.includes(word)) ||
+        /^[0-9\s.()-]+$/.test(cleaned);
+
+      if (!looksBad && !seen.has(key)) {
+        seen.add(key);
+        candidates.push(cleaned);
+      }
+    });
+  });
+
+  const labeledName =
+    text.match(/(?:약품명|약명|약 이름|의약품)[:\s]+([^\n]+)/)?.[1] ||
+    text.match(/약품명및용량\s+([^\n]+)/)?.[1];
+
+  if (labeledName) {
+    const cleaned = cleanMedicineCandidate(labeledName);
+    const key = cleaned.replace(/\s/g, "").toLowerCase();
+    if (cleaned.length >= 3 && !seen.has(key)) {
+      candidates.unshift(cleaned);
+    }
+  }
+
+  return candidates.slice(0, 8);
+}
+
+function addDoseFromCandidate(name) {
+  const time = document.querySelector("#medicineTime").value || "08:00";
+  const rule = document.querySelector("#medicineRule").value || "식후 30분";
+
+  doses.push({
+    id: createId(),
+    name,
+    time,
+    rule,
+    done: false,
+  });
+
+  doses.sort((a, b) => a.time.localeCompare(b.time));
+  renderDoses();
+}
+
+function applyOcrText(text) {
+  const { hour, minute, rule } = getOcrSchedule(text);
+  const candidates = extractMedicineCandidates(text);
+  const fallbackName =
+    text.match(/(?:약품명|약명|약 이름|의약품)[:\s]+([^\n]+)/)?.[1]?.replace(/[.,]/g, "").trim() ||
+    "처방 약";
+  const name = candidates[0] || fallbackName;
 
   document.querySelector("#medicineName").value = name;
   document.querySelector("#medicineTime").value = `${hour}:${minute}`;
@@ -145,13 +216,48 @@ function applyOcrText(text) {
       <span>복용 시간: ${hour}:${minute}</span>
       <span>복용 기준: ${escapeHtml(rule)}</span>
     </div>
-    <p class="ocr-help">아래 입력칸을 확인하고 틀린 부분만 직접 고치면 돼요.</p>
+    ${
+      candidates.length
+        ? `<div class="ocr-candidates">
+            <strong>찾은 약 후보 ${candidates.length}개</strong>
+            ${candidates
+              .map(
+                (candidate) => `
+                  <div class="ocr-candidate">
+                    <span>${escapeHtml(candidate)}</span>
+                    <div>
+                      <button type="button" data-fill-medicine="${escapeHtml(candidate)}">입력</button>
+                      <button type="button" data-add-medicine="${escapeHtml(candidate)}">추가</button>
+                    </div>
+                  </div>
+                `,
+              )
+              .join("")}
+          </div>`
+        : ""
+    }
+    <p class="ocr-help">약이 여러 개인 경우 후보에서 각각 추가하거나, 아래 입력칸에서 직접 고치면 돼요.</p>
     <details class="ocr-raw">
       <summary>읽은 원문 보기</summary>
       <pre>${escapeHtml(text.trim()).slice(0, 1500)}</pre>
     </details>
   `;
 }
+
+ocrResult.addEventListener("click", (event) => {
+  const fillButton = event.target.closest("[data-fill-medicine]");
+  const addButton = event.target.closest("[data-add-medicine]");
+
+  if (fillButton) {
+    document.querySelector("#medicineName").value = fillButton.dataset.fillMedicine;
+    showToast("선택한 약을 입력칸에 넣었어요.");
+  }
+
+  if (addButton) {
+    addDoseFromCandidate(addButton.dataset.addMedicine);
+    showToast("선택한 약을 오늘 루틴에 추가했어요.");
+  }
+});
 
 function setOcrStatus(message) {
   ocrResult.textContent = message;
