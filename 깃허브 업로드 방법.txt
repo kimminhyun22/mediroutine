@@ -1,0 +1,36 @@
+메디루틴을 GitHub에 올리는 가장 쉬운 방법
+
+현재 상태:
+- 프로젝트는 Git 저장소로 준비되어 있습니다.
+- GitHub 저장소 주소도 연결되어 있습니다.
+- 남은 일은 GitHub 계정 로그인 후 업로드뿐입니다.
+
+추천 방법: GitHub Desktop 사용
+
+1. GitHub Desktop을 설치합니다.
+   https://desktop.github.com/
+
+2. GitHub Desktop을 열고 GitHub 계정으로 로그인합니다.
+
+3. 상단 메뉴에서 File → Add Local Repository를 누릅니다.
+
+4. 아래 폴더를 선택합니다.
+   /Users/gimminhyeon/Documents/웹서비스 개발
+
+5. 화면에 Push origin 또는 Publish repository 버튼이 보이면 누릅니다.
+
+6. 업로드가 끝나면 GitHub에서 아래 주소를 엽니다.
+   https://github.com/kimminhyun22/mediroutine
+
+7. Settings → Pages로 이동합니다.
+
+8. Source를 Deploy from a branch로 선택합니다.
+
+9. Branch를 main, 폴더를 /root로 선택하고 Save를 누릅니다.
+
+10. 잠시 기다리면 아래 같은 주소가 생깁니다.
+    https://kimminhyun22.github.io/mediroutine/
+
+휴대폰 설치:
+- 아이폰: Safari에서 배포 주소 접속 → 공유 버튼 → 홈 화면에 추가
+- 안드로이드: Chrome에서 배포 주소 접속 → 메뉴 → 앱 설치 또는 홈 화면에 추가
