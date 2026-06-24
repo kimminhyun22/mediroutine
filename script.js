@@ -36,6 +36,7 @@ const ocrPreview = document.querySelector("#ocrPreview");
 const ocrResult = document.querySelector("#ocrResult");
 const installDialog = document.querySelector("#installDialog");
 let deferredInstallPrompt = null;
+let ocrWorkerPromise = null;
 
 function escapeHtml(value) {
   return value
@@ -133,6 +134,72 @@ function applyOcrText(text) {
   ocrResult.textContent = `읽은 내용\n${text.trim()}\n\n자동 입력: ${name}, ${hour}:${minute}, ${rule}`;
 }
 
+function setOcrStatus(message) {
+  ocrResult.textContent = message;
+}
+
+async function prepareImageForOcr(file) {
+  const imageUrl = URL.createObjectURL(file);
+  const image = new Image();
+
+  await new Promise((resolve, reject) => {
+    image.onload = resolve;
+    image.onerror = reject;
+    image.src = imageUrl;
+  });
+
+  const targetWidth = Math.min(1800, Math.max(1200, image.naturalWidth));
+  const scale = targetWidth / image.naturalWidth;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(image.naturalWidth * scale);
+  canvas.height = Math.round(image.naturalHeight * scale);
+
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+  const pixels = imageData.data;
+
+  for (let i = 0; i < pixels.length; i += 4) {
+    const gray = pixels[i] * 0.299 + pixels[i + 1] * 0.587 + pixels[i + 2] * 0.114;
+    const contrast = Math.max(0, Math.min(255, (gray - 128) * 1.35 + 128));
+    pixels[i] = contrast;
+    pixels[i + 1] = contrast;
+    pixels[i + 2] = contrast;
+  }
+
+  context.putImageData(imageData, 0, 0);
+  URL.revokeObjectURL(imageUrl);
+  return canvas;
+}
+
+function updateOcrProgress(message) {
+  if (!message?.status) return;
+
+  const percent = Math.round((message.progress || 0) * 100);
+  if (message.status === "recognizing text") {
+    setOcrStatus(`글자를 읽는 중이에요... ${percent}%`);
+    return;
+  }
+
+  if (message.status.includes("loading") || message.status.includes("initializing")) {
+    setOcrStatus(`OCR 엔진을 준비하는 중이에요... ${percent}%`);
+  }
+}
+
+async function getOcrWorker() {
+  if (!window.Tesseract?.createWorker) {
+    throw new Error("Tesseract.js가 아직 불러와지지 않았어요.");
+  }
+
+  if (!ocrWorkerPromise) {
+    ocrWorkerPromise = Tesseract.createWorker("kor+eng", 1, {
+      logger: updateOcrProgress,
+    });
+  }
+
+  return ocrWorkerPromise;
+}
+
 prescriptionImage.addEventListener("change", () => {
   const file = prescriptionImage.files?.[0];
   if (!file) return;
@@ -149,30 +216,27 @@ document.querySelector("#runOcr").addEventListener("click", async () => {
     return;
   }
 
-  if (!("TextDetector" in window)) {
-    ocrResult.textContent =
-      "이 브라우저에서는 실시간 OCR을 지원하지 않아요.\n샘플 읽기로 자동 입력 흐름을 확인해보세요.";
-    showToast("현재 브라우저가 OCR을 지원하지 않아요.");
-    return;
-  }
-
   try {
-    ocrResult.textContent = "이미지에서 글자를 읽는 중이에요...";
-    const detector = new TextDetector();
-    const bitmap = await createImageBitmap(file);
-    const results = await detector.detect(bitmap);
-    const text = results.map((item) => item.rawValue).join("\n");
+    setOcrStatus("사진을 OCR에 맞게 정리하는 중이에요...");
+    const image = await prepareImageForOcr(file);
+    const worker = await getOcrWorker();
+    const {
+      data: { text },
+    } = await worker.recognize(image);
 
     if (!text.trim()) {
-      ocrResult.textContent = "글자를 찾지 못했어요. 더 밝고 선명한 사진으로 다시 시도해보세요.";
+      setOcrStatus(
+        "글자를 찾지 못했어요.\n약봉투를 화면에 꽉 차게 찍고, 그림자 없이 밝은 곳에서 다시 시도해보세요.",
+      );
       return;
     }
 
     applyOcrText(text);
     showToast("사진에서 읽은 내용으로 입력했어요.");
   } catch {
-    ocrResult.textContent =
-      "OCR 처리 중 문제가 생겼어요.\n샘플 읽기로 자동 입력 흐름을 확인해보세요.";
+    setOcrStatus(
+      "OCR 엔진을 불러오지 못했어요.\n인터넷 연결을 확인한 뒤 다시 시도하거나, 샘플 읽기로 흐름을 확인해보세요.",
+    );
     showToast("OCR을 완료하지 못했어요.");
   }
 });

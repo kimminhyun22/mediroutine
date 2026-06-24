@@ -103,7 +103,9 @@
                 <button class="secondary-button" id="runOcr" type="button">글자 읽기</button>
                 <button class="secondary-button" id="demoOcr" type="button">샘플 읽기</button>
               </div>
-              <div class="ocr-result" id="ocrResult" aria-live="polite">아직 읽은 내용이 없어요.</div>
+              <div class="ocr-result" id="ocrResult" aria-live="polite">
+                아직 읽은 내용이 없어요. 첫 OCR은 준비에 10~30초 걸릴 수 있어요.
+              </div>
             </div>
 
             <form class="routine-form" id="routineForm">
@@ -197,6 +199,7 @@
     </dialog>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="./script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
+    <script src="./script.js" defer></script>
   </body>
 </html>
