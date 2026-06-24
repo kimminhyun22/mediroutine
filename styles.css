@@ -421,7 +421,8 @@ button {
   font-weight: 800;
 }
 
-#prescriptionImage {
+#prescriptionImage,
+#cameraImage {
   position: absolute;
   inline-size: 1px;
   block-size: 1px;
@@ -441,6 +442,13 @@ button {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+}
+
+.file-button {
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  text-align: center;
 }
 
 .ocr-result {

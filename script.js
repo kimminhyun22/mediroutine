@@ -31,12 +31,14 @@ const routineForm = document.querySelector("#routineForm");
 const toast = document.querySelector("#toast");
 const shareToggle = document.querySelector("#shareToggle");
 const shareText = document.querySelector("#shareText");
+const cameraImage = document.querySelector("#cameraImage");
 const prescriptionImage = document.querySelector("#prescriptionImage");
 const ocrPreview = document.querySelector("#ocrPreview");
 const ocrResult = document.querySelector("#ocrResult");
 const installDialog = document.querySelector("#installDialog");
 let deferredInstallPrompt = null;
 let ocrWorkerPromise = null;
+let selectedOcrFile = null;
 
 function escapeHtml(value) {
   return value
@@ -200,19 +202,23 @@ async function getOcrWorker() {
   return ocrWorkerPromise;
 }
 
-prescriptionImage.addEventListener("change", () => {
-  const file = prescriptionImage.files?.[0];
+function handleOcrImageChange(input) {
+  const file = input.files?.[0];
   if (!file) return;
 
+  selectedOcrFile = file;
   ocrPreview.src = URL.createObjectURL(file);
   ocrPreview.hidden = false;
-  ocrResult.textContent = "이미지를 불러왔어요. 이제 글자 읽기를 눌러주세요.";
-});
+  ocrResult.textContent = "사진을 불러왔어요. 이제 글자 읽기를 눌러주세요.";
+}
+
+cameraImage.addEventListener("change", () => handleOcrImageChange(cameraImage));
+prescriptionImage.addEventListener("change", () => handleOcrImageChange(prescriptionImage));
 
 document.querySelector("#runOcr").addEventListener("click", async () => {
-  const file = prescriptionImage.files?.[0];
+  const file = selectedOcrFile;
   if (!file) {
-    showToast("먼저 약봉투 사진을 올려주세요.");
+    showToast("먼저 약봉투를 찍거나 사진을 선택해주세요.");
     return;
   }
 

@@ -92,14 +92,17 @@
             </div>
 
             <div class="ocr-box">
-              <label class="upload-zone" for="prescriptionImage">
+              <label class="upload-zone" for="cameraImage">
                 <span class="upload-icon">▣</span>
                 <strong>약봉투 사진으로 자동 입력</strong>
-                <span>이미지를 올리면 글자를 읽어 등록폼에 채워요.</span>
+                <span>카메라로 바로 찍거나 앨범 사진을 선택할 수 있어요.</span>
               </label>
+              <input id="cameraImage" type="file" accept="image/*" capture="environment" />
               <input id="prescriptionImage" type="file" accept="image/*" />
               <img id="ocrPreview" alt="업로드한 처방전 또는 약봉투 미리보기" hidden />
               <div class="ocr-actions">
+                <label class="secondary-button file-button" for="cameraImage">카메라로 찍기</label>
+                <label class="secondary-button file-button" for="prescriptionImage">앨범에서 선택</label>
                 <button class="secondary-button" id="runOcr" type="button">글자 읽기</button>
                 <button class="secondary-button" id="demoOcr" type="button">샘플 읽기</button>
               </div>
